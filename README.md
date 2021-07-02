@@ -23,13 +23,17 @@ The API has two endpoints: GetPointsForAmount and GetUserPointsForPastNMonths.
 ##### GetPointsForAmount --
 
 URL: https://localhost:44351/Points/GetForAmount/{amount}
+<br>
 Parameters: amount (decimal type)
+<br>
 Response: Total rewarded points for a transaction of that amount (int type).
 
 ##### GetUserPointsForPastNMonths --
 
 URL: https://localhost:44351/Points/User/GetForPastNMonths/{numOfMonths}
+<br>
 Parameters: numOfMonths (int type)
+<br>
 Response: A list of users and their total points over the past N months, along with a monthly breakdown of how many points they earned per month over that time (IEnumerable<UserPoints> type).
 
 #### Demo -
