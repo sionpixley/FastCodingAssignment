@@ -1,0 +1,6 @@
+USE [Fast]
+GO
+GRANT EXECUTE TO [API-Fast];
+GO
+GRANT SELECT TO [API-Fast];
+GO

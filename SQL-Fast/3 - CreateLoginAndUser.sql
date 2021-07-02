@@ -1,0 +1,10 @@
+CREATE LOGIN [API-Fast] 
+WITH PASSWORD = 'example',
+DEFAULT_DATABASE = [Fast];
+GO
+
+USE [Fast]
+GO
+
+CREATE USER [API-Fast] FOR LOGIN [API-Fast];
+GO
