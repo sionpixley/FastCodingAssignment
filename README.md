@@ -34,7 +34,7 @@ URL: https://localhost:44351/Points/User/GetForPastNMonths/{numOfMonths}
 <br>
 Parameters: numOfMonths (int type)
 <br>
-Response: A list of users and their total points over the past N months, along with a monthly breakdown of how many points they earned per month over that time (IEnumerable<UserPoints> type).
+Response: A list of users and their total points over the past N months, along with a monthly breakdown of how many points they earned per month over that time (IEnumerable\<UserPoints\> type).
 
 #### Demo -
 
