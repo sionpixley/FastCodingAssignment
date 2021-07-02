@@ -25,10 +25,11 @@ namespace Fast.API.Controllers {
 			}
 		}
 
-		[HttpGet("GetPastNMonthsByUser/{numOfMonths}")]
-		public async Task<ActionResult<IEnumerable<UserPoints>>> GetPointsPastNMonthsByUser(int numOfMonths) {
+		[HttpGet("User/GetForPastNMonths/{numOfMonths}")]
+		public async Task<ActionResult<IEnumerable<UserPoints>>> GetUserPointsForPastNMonths(int numOfMonths) {
 			try {
-				return Ok(await _Domain.GetPointsPastNMonthsByUser(numOfMonths));
+				// I want to include the current month, so I subract 1 from the input.
+				return Ok(await _Domain.GetUserPointsForPastNMonths(numOfMonths - 1));
 			}
 			catch(Exception e) {
 				return StatusCode(500, e.Message);

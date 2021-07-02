@@ -7,7 +7,8 @@ GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_Transaction_Get]
 	@Id AS BIGINT = 0,
 	@Username AS VARCHAR(512) = '',
-	@AfterEqualDate AS DATETIME = '2000-01-01T00:00:00.000Z'
+	@AfterDate AS DATETIME = '2000-01-01T00:00:00.000',
+	@BeforeDate AS DATETIME = '2000-01-01T00:00:00.000'
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -28,11 +29,11 @@ BEGIN
 		ORDER BY [t].[Id] ASC;
 	END
 
-	ELSE IF @AfterEqualDate <> '2000-01-01T00:00:00.000Z'
+	ELSE IF @AfterDate <> '2000-01-01T00:00:00.000' AND @BeforeDate <> '2000-01-01T00:00:00.000'
 	BEGIN
 		SELECT DISTINCT *
 		FROM [dbo].[Transaction] AS [t]
-		WHERE [t].[CreateDate] >= @AfterEqualDate
+		WHERE [t].[CreateDate] BETWEEN @AfterDate AND @BeforeDate
 		ORDER BY [t].[Id] ASC;
 	END
 

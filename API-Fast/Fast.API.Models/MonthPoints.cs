@@ -5,10 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Fast.API.Models {
-	public class UserPoints {
-		public string Username { get; set; }
-		public string Name { get; set; }
+	public class MonthPoints {
+		public string Month { get; set; }
 		public int Points { get; set; }
-		public IEnumerable<MonthPoints> MonthlyBreakdown { get; set; }
 	}
 }

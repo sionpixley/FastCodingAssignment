@@ -24,35 +24,71 @@ namespace Fast.API.Services {
 			return points;
 		}
 
-		public async Task<IEnumerable<UserPoints>> GetPointsPastNMonthsByUser(int numOfMonths) {
+		public async Task<IEnumerable<UserPoints>> GetUserPointsForPastNMonths(int numOfMonths) {
 			List<UserPoints> response = new();
 
-			DateTime now = DateTime.UtcNow;
-			now = now.AddMonths(-numOfMonths);
+			DateTime before = DateTime.UtcNow;
+			DateTime after = before.AddMonths(-numOfMonths);
 
-			IEnumerable<Transaction> transactions = await _Repo.GetTransactionsAfterDate(now.ToString("yyyy-MM-ddTHH:mm:ss.fff"));
+			// Getting all the transactions by every user within the date range.
+			IEnumerable<Transaction> transactions = await _Repo.GetTransactionsInDateRange(after.ToString("yyyy-MM-ddTHH:mm:ss.fff"), before.ToString("yyyy-MM-ddTHH:mm:ss.fff"));
 
+			// Creating an ordered set based on the user's id.
 			IEnumerable<int> userIds = transactions.Select(transaction => transaction.UserId).Distinct().OrderBy(id => id);
+
 			foreach(var id in userIds) {
-				int points = 0;
-				User user = await _Repo.GetUser(id);
+				// Grabbing just the current user's transactions.
 				IEnumerable<Transaction> userTransactions = transactions.Where(transaction => transaction.UserId == id);
-				foreach(var transaction in userTransactions) {
-					if(transaction.Amount > 100) {
-						points += ((Convert.ToInt32(Math.Floor(transaction.Amount)) - 100) * 2) + 50;
-					}
-					else if(transaction.Amount > 50) {
-						points += Convert.ToInt32(Math.Floor(transaction.Amount)) - 50;
-					}
-				}
+
+				
+				Task<User> user = _Repo.GetUser(id);
+				Task<int> points = _GetTotalPoints(userTransactions);
+				// Adding 1 back to the numOfMonths because it comes in 1 less than it should.
+				Task<IEnumerable<MonthPoints>> monthlyBreakdown = _GetMonthlyBreakdown(userTransactions, after, numOfMonths + 1);
+
+				// Running these in parallel to improve performance.
+				await Task.WhenAll(user, points, monthlyBreakdown);
+				
+				// Building the info for the current user and adding it to the list to be returned.
 				response.Add(new UserPoints() {
-					Username = user.Username,
-					Name = $"{user.FirstName}{((user.MiddleInitial == null) ? "" : $" {user.MiddleInitial}.")}{((user.LastName == null) ? "" : $" {user.LastName}")}",
-					Points = points
+					Username = user.Result.Username,
+					Name = $"{user.Result.FirstName}{((user.Result.MiddleInitial == null) ? "" : $" {user.Result.MiddleInitial}.")}{((user.Result.LastName == null) ? "" : $" {user.Result.LastName}")}",
+					Points = points.Result,
+					MonthlyBreakdown = monthlyBreakdown.Result
 				});
 			}
 
 			return response;
+		}
+
+		private async Task<IEnumerable<MonthPoints>> _GetMonthlyBreakdown(IEnumerable<Transaction> transactions, DateTime startDate, int numOfMonths) {
+			List<MonthPoints> breakdown = new();
+
+			for(int i = 0; i < numOfMonths; i += 1) {
+				// Only getting the transactions for the current month.
+				IEnumerable<Transaction> monthlyTransactions = transactions.Where(transaction => Convert.ToDateTime(transaction.CreateDate).Month == startDate.Month);
+				int monthlyPoints = await _GetTotalPoints(monthlyTransactions);
+				breakdown.Add(new MonthPoints() {
+					Month = startDate.ToString("MMMM"),
+					Points = monthlyPoints
+				});
+				startDate = startDate.AddMonths(1);
+			}
+
+			return breakdown;
+		}
+
+		private async Task<int> _GetTotalPoints(IEnumerable<Transaction> transactions) {
+			int points = 0;
+			foreach(var transaction in transactions) {
+				if(transaction.Amount > 100) {
+					points += ((Convert.ToInt32(Math.Floor(transaction.Amount)) - 100) * 2) + 50;
+				}
+				else if(transaction.Amount > 50) {
+					points += Convert.ToInt32(Math.Floor(transaction.Amount)) - 50;
+				}
+			}
+			return points;
 		}
 	}
 }
