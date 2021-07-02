@@ -28,6 +28,8 @@ namespace Fast.API.Services {
 
 			DateTime before = DateTime.UtcNow;
 			DateTime after = before.AddMonths(-numOfMonths);
+			// Moving after to the beginning of the month.
+			after = Convert.ToDateTime($"{after.Year}-{after.Month}-01T00:00:00.000");
 
 			// Getting all the transactions by every user within the date range.
 			IEnumerable<Transaction> transactions = await _Repo.GetTransactionsInDateRange(after.ToString("yyyy-MM-ddTHH:mm:ss.fff"), before.ToString("yyyy-MM-ddTHH:mm:ss.fff"));
