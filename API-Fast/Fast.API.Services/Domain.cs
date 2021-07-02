@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Fast.API.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Fast.API.Models;
 
 namespace Fast.API.Services {
 	public class Domain {
@@ -40,7 +39,7 @@ namespace Fast.API.Services {
 				// Grabbing just the current user's transactions.
 				IEnumerable<Transaction> userTransactions = transactions.Where(transaction => transaction.UserId == id);
 
-				
+
 				Task<User> user = _Repo.GetUser(id);
 				Task<int> points = _GetTotalPoints(userTransactions);
 				// Adding 1 back to the numOfMonths because it comes in 1 less than it should.
@@ -48,7 +47,7 @@ namespace Fast.API.Services {
 
 				// Running these in parallel to improve performance.
 				await Task.WhenAll(user, points, monthlyBreakdown);
-				
+
 				// Building the info for the current user and adding it to the list to be returned.
 				response.Add(new UserPoints() {
 					Username = user.Result.Username,

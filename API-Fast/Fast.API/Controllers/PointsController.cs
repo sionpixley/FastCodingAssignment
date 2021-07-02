@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Fast.API.Models;
+using Fast.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Fast.API.Services;
-using Fast.API.Models;
 
 namespace Fast.API.Controllers {
 	[Route("Points")]

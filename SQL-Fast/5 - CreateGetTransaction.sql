@@ -41,7 +41,7 @@ BEGIN
 	BEGIN
 		SELECT DISTINCT *
 		FROM [dbo].[Transaction] AS [t]
-		ORDER BY [t].[Id];
+		ORDER BY [t].[Id] ASC;
 	END
 
 END 
